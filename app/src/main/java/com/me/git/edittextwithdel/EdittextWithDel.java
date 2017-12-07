@@ -27,7 +27,7 @@ public class EdittextWithDel extends EditText implements View.OnFocusChangeListe
 
     public EdittextWithDel(Context context, AttributeSet attrs) {
         //这里构造方法也很重要，不加这个很多属性不能再XML里面定义
-        this(context, attrs,0);
+        this(context, attrs,android.R.attr.editTextStyle);
     }
 
     public EdittextWithDel(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -52,30 +52,32 @@ public class EdittextWithDel extends EditText implements View.OnFocusChangeListe
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int x = (int) event.getX();
-        //判断触摸点是否在水平范围内
-        //getTotalPaddingRight():clean的图标左边缘至控件右边缘的距离
-        boolean isInnerWidth = (x > (getWidth()-getTotalPaddingRight()))&&(x < (getWidth() - getPaddingRight()));
-        //获取删除图标的边界，返回一个Rect对象
-        Rect rect = mClearDrawable.getBounds();
-        //获取删除图标的高度
-        int height = rect.height();
-        int y = (int) event.getY();
-        //计算图标底部到控件底部的距离
-        int distance = (getHeight() - height) / 2;
-        //判断触摸点是否在竖直范围内(可能会有点误差)
-        //触摸点的纵坐标在distance到（distance+图标自身的高度）之内，则视为点中删除图标
-        boolean isInnerHeigh = (y > distance)&&(y < height + distance);
-        if (isInnerHeigh && isInnerWidth){
-            setText("");
+        if (mClearDrawable != null && event.getAction() == MotionEvent.ACTION_UP){
+            int x = (int) event.getX();
+            //判断触摸点是否在水平范围内
+            //getTotalPaddingRight():clean的图标左边缘至控件右边缘的距离
+            boolean isInnerWidth = (x > (getWidth()-getTotalPaddingRight()))&&(x < (getWidth() - getPaddingRight()));
+            //获取删除图标的边界，返回一个Rect对象
+            Rect rect = mClearDrawable.getBounds();
+            //获取删除图标的高度
+            int height = rect.height();
+            int y = (int) event.getY();
+            //计算图标底部到控件底部的距离
+            int distance = (getHeight() - height) / 2;
+            //判断触摸点是否在竖直范围内(可能会有点误差)
+            //触摸点的纵坐标在distance到（distance+图标自身的高度）之内，则视为点中删除图标
+            boolean isInnerHeigh = (y > distance)&&(y < height + distance);
+            if (isInnerHeigh && isInnerWidth){
+                setText("");
+            }
         }
+
         return super.onTouchEvent(event);
     }
 
     /**
      * 设置清除图标的显示与隐藏，调用setCompoundDrawables为EditText绘制上去
      *
-     * @param visible
      */
     private void setDelBtnVisible(boolean b) {
         Drawable right = b?mClearDrawable:null;
@@ -121,7 +123,7 @@ public class EdittextWithDel extends EditText implements View.OnFocusChangeListe
     /**
      * 晃动动画
      *
-     * @param counts 1秒钟晃动多少下
+     * @param count 1秒钟晃动多少下
      * @return
      */
     private Animation shakeAnimation(int count) {
